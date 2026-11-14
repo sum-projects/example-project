@@ -28,9 +28,17 @@ install: ## Install Composer dependencies
 migrate: ## Run pending database migrations
 	$(PHP) bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 
-migration: ## Generate a migration from the mapping changes
-	$(PHP) bin/console doctrine:migrations:diff
-	$(PHP) vendor/bin/php-cs-fixer fix migrations --quiet
+# A module owns its tables, its schema and its migrations. The filter limits the
+# diff to that schema (Leads -> leads, CustomerCare -> customer_care), so a pending
+# change in another module never leaks into this module's migration.
+MODULE_SCHEMA = $(shell echo '$(MODULE)' | sed -E 's/([a-z0-9])([A-Z])/\1_\2/g' | tr '[:upper:]' '[:lower:]')
+MODULE_MIGRATIONS = src/$(MODULE)/Infrastructure/Persistence/Migrations
+
+migration: ## Generate a migration for one module from its mapping changes (MODULE=Name)
+	@test -n '$(MODULE)' || { echo 'Usage: make migration MODULE=<Module>'; exit 1; }
+	@test -d '$(MODULE_MIGRATIONS)' || { echo 'No migrations directory: $(MODULE_MIGRATIONS)'; exit 1; }
+	$(PHP) bin/console doctrine:migrations:diff --namespace='App\$(MODULE)\Infrastructure\Persistence\Migrations' --filter-expression='~^$(MODULE_SCHEMA)\.~'
+	$(PHP) vendor/bin/php-cs-fixer fix $(MODULE_MIGRATIONS) --quiet
 
 cs: ## Check code style (PHP-CS-Fixer dry run)
 	$(PHP) vendor/bin/php-cs-fixer check --diff --show-progress=none
