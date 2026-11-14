@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v7
+        with:
+          # The workspace is mounted into a container that runs third-party code.
+          persist-credentials: false
 
       - name: Start the stack
         run: make up
