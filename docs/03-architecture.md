@@ -26,13 +26,15 @@ src/
   Shared/
     Domain/            shared kernel (see domain model)
     Application/       CommandBus, QueryBus, EventBus interfaces; Command, Query markers
-    Infrastructure/    Messenger bus adapters, middleware, problem-details listener, clock
+    Infrastructure/    Messenger bus adapters, middleware, problem-details listener, clock, health endpoint
 tests/
   Unit/ Integration/ Functional/     mirror the src/ structure
 config/ migrations/ docker/
 ```
 
 Namespace root is `App\`.
+
+The `/health` endpoint belongs to no bounded context and carries no business rule, so its controller and its database check live in `Shared\Infrastructure` instead of a module's `UserInterface`.
 
 ## Layer rules
 

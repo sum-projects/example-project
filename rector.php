@@ -7,6 +7,7 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/src',
         __DIR__.'/tests',
+        __DIR__.'/migrations',
     ])
     ->withCache(__DIR__.'/var/rector')
     // Without arguments both follow composer.json: the PHP sets up to the required

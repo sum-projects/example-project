@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help up down logs sh install cs cs-fix stan deptrac rector rector-fix test test-unit test-integration test-functional infection audit qa
+.PHONY: help up down logs sh install migrate migration test-db cs cs-fix stan deptrac rector rector-fix test test-unit test-integration test-functional infection audit qa
 
 MAKEFLAGS += --no-print-directory
 PHP := docker compose exec php
@@ -25,6 +25,13 @@ sh: ## Open a shell in the php container
 install: ## Install Composer dependencies
 	docker compose exec php composer install
 
+migrate: ## Run pending database migrations
+	$(PHP) bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+migration: ## Generate a migration from the mapping changes
+	$(PHP) bin/console doctrine:migrations:diff
+	$(PHP) vendor/bin/php-cs-fixer fix migrations --quiet
+
 cs: ## Check code style (PHP-CS-Fixer dry run)
 	$(PHP) vendor/bin/php-cs-fixer check --diff --show-progress=none
 
@@ -44,17 +51,21 @@ rector: ## Show pending Rector changes (dry run)
 rector-fix: ## Apply Rector changes
 	$(PHP) vendor/bin/rector process --no-progress-bar
 
-test: ## Run all test suites (FILTER=name, FILE=path)
+test: test-db ## Run all test suites (FILTER=name, FILE=path)
 	$(PHP) vendor/bin/phpunit $(if $(FILTER),--filter '$(FILTER)') $(FILE)
 
 test-unit: ## Run the unit suite
 	$(PHP) vendor/bin/phpunit --testsuite unit
 
-test-integration: ## Run the integration suite
+test-integration: test-db ## Run the integration suite
 	$(PHP) vendor/bin/phpunit --testsuite integration
 
-test-functional: ## Run the functional suite
+test-functional: test-db ## Run the functional suite
 	$(PHP) vendor/bin/phpunit --testsuite functional
+
+# Tests run against app_test, whose schema comes from the same migrations.
+test-db:
+	$(PHP) bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration --quiet
 
 # The src/ path filter matches every source file, so it changes nothing once code
 # exists. It is here because Infection fails on an empty source set unless a

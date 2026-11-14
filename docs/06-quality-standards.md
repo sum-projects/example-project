@@ -16,7 +16,7 @@ A change is complete when `make qa` passes. CI also runs mutation testing and a 
 
 Suppressions (`@phpstan-ignore`, baseline entries, Deptrac skips) are not used to get a change through. If a rule is wrong for the project, change the rule in its own commit and explain why.
 
-Two settings exist only because the project has no Domain code and no unit or functional tests yet, and are removed when those arrive: `failOnEmptyTestSuite="false"` in `phpunit.dist.xml` goes once all three suites have a test, and `ignoreMsiWithNoMutations` in `infection.json5` together with the `src/` path filter in the `infection` target go with the first Domain or Application class that has logic to mutate.
+Two settings exist only because the project has no Domain or Application code yet, and are removed when it arrives: `failOnEmptyTestSuite="false"` in `phpunit.dist.xml` goes with the first unit test, when all three suites have one, and `ignoreMsiWithNoMutations` in `infection.json5` together with the `src/` path filter in the `infection` target go with the first Domain or Application class that has logic to mutate.
 
 ## Coding rules
 
@@ -38,6 +38,8 @@ Two settings exist only because the project has no Domain code and no unit or fu
 | Unit | Domain and Application | Plain PHPUnit, in-memory repositories, fixed clock; no kernel, no database | Milliseconds |
 | Integration | Infrastructure adapters | Kernel and real PostgreSQL; each test in a rolled-back transaction | Fast |
 | Functional | Whole use cases over HTTP | Kernel browser, real database, in-memory outbox transport | Slower |
+
+The rollback of each integration test is set up together with the first test that writes to the database, in M3; no test writes before that.
 
 What each suite is responsible for:
 
