@@ -14,6 +14,8 @@ $finder = new Finder()
         'config/bundles.php',
         'config/reference.php',
     ])
+    // PHP entry points without a .php extension.
+    ->append([__DIR__.'/bin/console', __DIR__.'/bin/phpunit'])
 ;
 
 return new Config()

@@ -78,19 +78,41 @@ deptrac:
       collectors:
         - type: classNameRegex
           value: '#^App\\Shared\\Infrastructure\\#'
-    # Every class-like outside App\ that is not a PHP internal class. PHP internals
-    # belong to no layer, so they stay allowed everywhere.
+    # Doctrine is persistence, which only Infrastructure may touch.
+    - name: Doctrine
+      collectors:
+        - type: classNameRegex
+          value: '#^Doctrine\\#'
+    # Every other class-like outside App\ that is not a PHP internal class. PHP
+    # internals belong to no layer, so they stay allowed everywhere.
     - name: Vendor
       collectors:
         - type: bool
           must:
             - type: classNameRegex
-              value: '#^(?!App\\)#'
+              value: '#^(?!App\\|Doctrine\\)#'
           must_not:
             - type: php_internal
               value: '.*'
+    # Anything under App\ that no layer above claims: a class outside the layer
+    # directories, or a module that has no layers here yet. It may depend on nothing
+    # and nothing may depend on it, so forgetting to add a layer fails the build.
+    - name: Unassigned
+      collectors:
+        - type: bool
+          must:
+            - type: classNameRegex
+              value: '#^App\\#'
+          must_not:
+            - type: classNameRegex
+              value: '#^App\\(Leads|Customers|Sales)\\(Domain|Application|Infrastructure|UserInterface|Contract)\\#'
+            - type: classNameRegex
+              value: '#^App\\Shared\\(Domain|Application|Infrastructure)\\#'
+            - type: classNameRegex
+              value: '#^App\\Kernel$#'
 
   ruleset:
+    Unassigned: ~
     SharedDomain: ~
     SharedApplication:
       - SharedDomain
@@ -98,6 +120,7 @@ deptrac:
       - SharedDomain
       - SharedApplication
       - Vendor
+      - Doctrine
     LeadsDomain:
       - SharedDomain
     LeadsApplication:
@@ -118,6 +141,7 @@ deptrac:
       - CustomersContract
       - SalesContract
       - Vendor
+      - Doctrine
     LeadsUserInterface:
       - LeadsApplication
       - SharedDomain
@@ -145,6 +169,7 @@ deptrac:
       - LeadsContract
       - SalesContract
       - Vendor
+      - Doctrine
     CustomersUserInterface:
       - CustomersApplication
       - SharedDomain
@@ -172,6 +197,7 @@ deptrac:
       - LeadsContract
       - CustomersContract
       - Vendor
+      - Doctrine
     SalesUserInterface:
       - SalesApplication
       - SharedDomain

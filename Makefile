@@ -36,7 +36,7 @@ stan: ## Run PHPStan
 	$(PHP) vendor/bin/phpstan analyse --memory-limit=1G
 
 deptrac: ## Check layer and module boundaries
-	$(PHP) vendor/bin/deptrac analyse --no-progress
+	$(PHP) vendor/bin/deptrac analyse --no-progress --fail-on-uncovered
 
 rector: ## Show pending Rector changes (dry run)
 	$(PHP) vendor/bin/rector process --dry-run --no-progress-bar
@@ -45,7 +45,7 @@ rector-fix: ## Apply Rector changes
 	$(PHP) vendor/bin/rector process --no-progress-bar
 
 test: ## Run all test suites (FILTER=name, FILE=path)
-	$(PHP) vendor/bin/phpunit $(if $(FILTER),--filter $(FILTER)) $(FILE)
+	$(PHP) vendor/bin/phpunit $(if $(FILTER),--filter '$(FILTER)') $(FILE)
 
 test-unit: ## Run the unit suite
 	$(PHP) vendor/bin/phpunit --testsuite unit
@@ -56,12 +56,13 @@ test-integration: ## Run the integration suite
 test-functional: ## Run the functional suite
 	$(PHP) vendor/bin/phpunit --testsuite functional
 
-# --filter=src/ matches every source file, so it changes nothing once code exists.
-# It is here because Infection fails on an empty source set unless a filter is
-# active. Remove it, and ignoreMsiWithNoMutations in infection.json5, with the
-# first Domain or Application class, so an empty mutation run fails again.
+# The src/ path filter matches every source file, so it changes nothing once code
+# exists. It is here because Infection fails on an empty source set unless a
+# filter is active. Remove it, and ignoreMsiWithNoMutations in infection.json5,
+# with the first Domain or Application class that has logic to mutate, so an
+# empty mutation run fails again.
 infection: ## Run mutation testing on Domain and Application
-	docker compose exec -e XDEBUG_MODE=coverage php vendor/bin/infection --threads=max --no-progress --show-mutations --with-uncovered --filter=src/
+	docker compose exec -e XDEBUG_MODE=coverage php vendor/bin/infection --threads=max --no-progress --show-mutations --with-uncovered src/
 
 audit: ## Audit Composer dependencies for known vulnerabilities
 	$(PHP) composer audit
