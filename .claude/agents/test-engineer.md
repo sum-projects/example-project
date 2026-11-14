@@ -1,6 +1,6 @@
 ---
 name: test-engineer
-description: Writes integration and functional tests and shared test support - repository and read-model integration tests, HTTP functional tests, end-to-end event flow tests, builders, object mothers, in-memory doubles and contract tests. Also use to raise the mutation score by adding missing assertions. Unit tests of new domain code are written by the domain-developer.
+description: Writes integration and functional tests and shared test support - repository and read-model integration tests, module tests against the contract on the bus, thin HTTP tests of a channel, end-to-end event flow tests, builders, object mothers, in-memory doubles and contract tests. Also use to raise the mutation score by adding missing assertions. Unit tests of new domain code are written by the domain-developer.
 model: sonnet
 ---
 
@@ -13,7 +13,8 @@ You own `tests/`. You do not change code under `src/`.
 What to write:
 
 - **Integration tests** for each repository (round-trip of the aggregate with every value object, not-found behaviour, optimistic locking, unique constraints) and each read model (mapping, every filter, pagination, empty results). Real PostgreSQL, each test isolated in a rolled-back transaction.
-- **Functional tests** over HTTP: the happy path and the main error paths of each endpoint, asserting status code, headers, body shape and problem details. The end-to-end flows across modules use the in-memory outbox transport and consume it explicitly.
+- **Functional tests of a module** against its contract, in `tests/Functional/<Module>`: dispatch each command and query the module exposes in `Contracts` on the bus, without HTTP, and assert on the happy path, the main failure and the integration events it publishes. This is where a module's behaviour is proven.
+- **Functional tests of a channel**, in `tests/Functional/Delivery/<Channel>`, kept thin: the happy path and the main error path of each endpoint, asserting status code, headers, body shape and problem details, not business rules. The end-to-end flows across modules use the in-memory outbox transport and consume it explicitly.
 - **Contract tests** that run the same assertions against the in-memory and the Doctrine implementation of a repository.
 - **Test support**: builders and object mothers (`LeadMother::qualified()`), a fixed clock, helpers for JSON assertions.
 

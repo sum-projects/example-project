@@ -12,11 +12,12 @@ Read first: `docs/02-domain-model.md`, `docs/03-architecture.md`, `docs/04-api.m
 Look for, in this order:
 
 1. **Correctness of business rules.** Does the code implement each invariant and transition exactly as documented? Can an aggregate reach an invalid state through any public method? Are there rules enforced in handlers or controllers that belong in the aggregate?
-2. **Boundary violations.** Framework or ORM in Domain; Application depending on Infrastructure; one module importing another's internals; more than one aggregate changed in a transaction; a query handler loading aggregates; a command handler returning data.
-3. **Event and consistency errors.** Missing or duplicated domain events; integration events carrying domain types; consumers that are not idempotent; events published outside the transaction.
-4. **API contract.** Status codes, payload shapes and problem details as specified.
-5. **Tests.** Is each new rule tested on both the allowed and the rejected path? Do tests assert on behaviour or merely execute code? Are domain objects mocked?
-6. **Docs drift.** Behaviour that changed without the matching doc change.
+2. **Boundary violations.** Framework or ORM in Domain; Application depending on Infrastructure; one module importing anything of another except its facade (from `Infrastructure/Acl` only) and its integration events (in `Application/EventHandler` only); a foreign key, join or ORM relation across modules; domain types in `Contracts`; an entry point in the wrong place by the selection rule; business logic, more than one command per endpoint or cross-module list composition in the delivery layer; more than one aggregate changed in a transaction; a query that changes state or loads aggregates; a command handler returning data. Deptrac covers the imports; the rules listed under "Review" in the enforcement table of `docs/03-architecture.md` are yours to check.
+3. **Undeclared deviations.** A rule marked Default that the change departs from without an ADR, or a rule marked Invariant that it breaks at all.
+4. **Event and consistency errors.** Missing or duplicated domain events; integration events carrying domain types; consumers that are not idempotent or that break when events arrive out of order; events published outside the transaction; a facade that writes or calls another module.
+5. **API contract.** Status codes, payload shapes and problem details as specified.
+6. **Tests.** Is each new rule tested on both the allowed and the rejected path? Do tests assert on behaviour or merely execute code? Are domain objects mocked?
+7. **Docs drift.** Behaviour that changed without the matching doc change.
 
 Rules:
 

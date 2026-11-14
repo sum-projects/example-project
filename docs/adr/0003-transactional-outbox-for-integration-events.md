@@ -1,6 +1,6 @@
 # 0003. Transactional outbox for integration events
 
-Status: Accepted (2026-11-14)
+Status: Accepted (2026-11-14). Its premise that modules may not call each other is refined by [0007](0007-contracts-as-the-public-api-of-a-module.md): a module may read another through a facade, while every side effect still travels through the outbox.
 
 ## Context
 
