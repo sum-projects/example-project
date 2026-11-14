@@ -1,0 +1,181 @@
+# Layer and module rules. Source of truth: docs/03-architecture.md ("Layer rules").
+# Modules never reach into each other; the only cross-module import is a foreign Contract.
+deptrac:
+  paths:
+    - ./src
+  cache_file: ./var/.deptrac.cache
+
+  layers:
+    - name: LeadsDomain
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Leads\\Domain\\#'
+    - name: LeadsApplication
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Leads\\Application\\#'
+    - name: LeadsInfrastructure
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Leads\\Infrastructure\\#'
+    - name: LeadsUserInterface
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Leads\\UserInterface\\#'
+    - name: LeadsContract
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Leads\\Contract\\#'
+    - name: CustomersDomain
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Customers\\Domain\\#'
+    - name: CustomersApplication
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Customers\\Application\\#'
+    - name: CustomersInfrastructure
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Customers\\Infrastructure\\#'
+    - name: CustomersUserInterface
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Customers\\UserInterface\\#'
+    - name: CustomersContract
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Customers\\Contract\\#'
+    - name: SalesDomain
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Sales\\Domain\\#'
+    - name: SalesApplication
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Sales\\Application\\#'
+    - name: SalesInfrastructure
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Sales\\Infrastructure\\#'
+    - name: SalesUserInterface
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Sales\\UserInterface\\#'
+    - name: SalesContract
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Sales\\Contract\\#'
+    - name: SharedDomain
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Shared\\Domain\\#'
+    - name: SharedApplication
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Shared\\Application\\#'
+    - name: SharedInfrastructure
+      collectors:
+        - type: classNameRegex
+          value: '#^App\\Shared\\Infrastructure\\#'
+    # Every class-like outside App\ that is not a PHP internal class. PHP internals
+    # belong to no layer, so they stay allowed everywhere.
+    - name: Vendor
+      collectors:
+        - type: bool
+          must:
+            - type: classNameRegex
+              value: '#^(?!App\\)#'
+          must_not:
+            - type: php_internal
+              value: '.*'
+
+  ruleset:
+    SharedDomain: ~
+    SharedApplication:
+      - SharedDomain
+    SharedInfrastructure:
+      - SharedDomain
+      - SharedApplication
+      - Vendor
+    LeadsDomain:
+      - SharedDomain
+    LeadsApplication:
+      - LeadsDomain
+      - LeadsContract
+      - SharedDomain
+      - SharedApplication
+      - CustomersContract
+      - SalesContract
+    LeadsInfrastructure:
+      - LeadsDomain
+      - LeadsApplication
+      - LeadsUserInterface
+      - LeadsContract
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - CustomersContract
+      - SalesContract
+      - Vendor
+    LeadsUserInterface:
+      - LeadsApplication
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    LeadsContract: ~
+    CustomersDomain:
+      - SharedDomain
+    CustomersApplication:
+      - CustomersDomain
+      - CustomersContract
+      - SharedDomain
+      - SharedApplication
+      - LeadsContract
+      - SalesContract
+    CustomersInfrastructure:
+      - CustomersDomain
+      - CustomersApplication
+      - CustomersUserInterface
+      - CustomersContract
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - LeadsContract
+      - SalesContract
+      - Vendor
+    CustomersUserInterface:
+      - CustomersApplication
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    CustomersContract: ~
+    SalesDomain:
+      - SharedDomain
+    SalesApplication:
+      - SalesDomain
+      - SalesContract
+      - SharedDomain
+      - SharedApplication
+      - LeadsContract
+      - CustomersContract
+    SalesInfrastructure:
+      - SalesDomain
+      - SalesApplication
+      - SalesUserInterface
+      - SalesContract
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - LeadsContract
+      - CustomersContract
+      - Vendor
+    SalesUserInterface:
+      - SalesApplication
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    SalesContract: ~

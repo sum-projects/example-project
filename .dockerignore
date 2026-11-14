@@ -22,3 +22,14 @@ vendor
 .env.*.local
 .env.dev
 .env.test
+
+# Tests and tooling never enter the production image
+tests
+phpunit.dist.xml
+phpstan.dist.neon
+deptrac.yaml
+infection.json5
+rector.php
+.php-cs-fixer.dist.php
+bin/phpunit
+.github
