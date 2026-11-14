@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=../../../vendor/symfony/routing/Loader/schema/routing.schema.json
+
+# Technical entry points that belong to no module, such as the health endpoint.
+shared_http:
+    resource: '../UserInterface/Http/'
+    type: attribute
+    # Route names are unique across the application, so each directory prefixes its own.
+    name_prefix: shared_
