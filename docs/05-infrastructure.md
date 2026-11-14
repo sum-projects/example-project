@@ -4,15 +4,15 @@
 
 | Concern | Choice |
 | --- | --- |
-| Language | PHP 8.4, `declare(strict_types=1)` everywhere |
-| Framework | Symfony 7.4 LTS |
+| Language | PHP 8.5, `declare(strict_types=1)` everywhere |
+| Framework | Symfony 8.1 |
 | Application server | FrankenPHP (Caddy plus PHP in one container) |
 | Database | PostgreSQL 17 |
 | ORM and SQL | Doctrine ORM (write side), Doctrine DBAL (read side), Doctrine Migrations |
 | Messaging | Symfony Messenger, Doctrine transport |
 | API description | NelmioApiDocBundle |
 
-Versions are pinned in `composer.json` and the Dockerfile; this table records the intended baseline at design time and is updated when they change.
+The project tracks the newest stable PHP and Symfony releases rather than an LTS line. Versions are pinned in `composer.json` and the Dockerfile, and this table is updated when they change. PHP-CS-Fixer and Rector read the required versions from `composer.json`, so raising a version there also raises the language level they enforce.
 
 ## Docker
 
@@ -21,7 +21,7 @@ Versions are pinned in `composer.json` and the Dockerfile; this table records th
 | Service | Purpose |
 | --- | --- |
 | `php` | FrankenPHP serving the API on `https://localhost` |
-| `worker` | Same image, runs `messenger:consume outbox` |
+| `worker` | Same image, runs `messenger:consume outbox`; added in M4 together with the outbox |
 | `database` | PostgreSQL with a named volume and a health check |
 
 The Dockerfile is multi-stage:
@@ -30,7 +30,15 @@ The Dockerfile is multi-stage:
 - `dev`: Xdebug and development configuration, source mounted as a volume
 - `prod`: dependencies installed without dev packages, optimised autoloader, opcache preloading, no source mount, non-root user
 
-`compose.override.yaml` holds development-only settings. A separate `test` database is created by the database container's init script so tests never touch development data.
+`compose.override.yaml` holds development-only settings. A separate `app_test` database is created by the database container's init script so tests never touch development data.
+
+Working with the stack:
+
+- After a fresh clone run `make up`, then `make install`.
+- Always start the stack through `make`. It passes the host user's uid and gid to the build, so the `dev` container runs as that user and the files it creates in the mounted source stay owned by the developer.
+- Host ports can be changed with `HTTP_PORT`, `HTTPS_PORT`, `HTTP3_PORT` and `POSTGRES_PORT`. PostgreSQL is published on `127.0.0.1` only.
+- The stack has no restart policy: it runs only between `make up` and `make down`.
+- Caddy executes only the front controller `public/index.php`; every other file in `public/` is served as a static file and other PHP files are never executed or exposed.
 
 ## Makefile contract
 
@@ -44,13 +52,16 @@ The Makefile is the only entry point for developers, agents and CI. Every target
 | `migrate` | Run migrations |
 | `migration` | Generate a migration from mapping changes |
 | `cs`, `cs-fix` | PHP-CS-Fixer dry run, fix |
-| `stan` | PHPStan |
+| `stan` | PHPStan; compiles the dev container first, because the Symfony extension reads it |
 | `deptrac` | Deptrac |
-| `rector` | Rector dry run |
+| `rector`, `rector-fix` | Rector dry run, apply |
 | `test` | All suites; accepts `FILTER=` and `FILE=` |
 | `test-unit`, `test-integration`, `test-functional` | One suite |
 | `infection` | Mutation testing |
-| `qa` | `cs`, `stan`, `deptrac`, `test` in that order |
+| `audit` | `composer audit` |
+| `qa` | `cs`, `rector`, `stan`, `deptrac`, `test` in that order |
+
+Every target exists except `migrate` and `migration`, which arrive together with Doctrine.
 
 ## Configuration
 
@@ -76,4 +87,4 @@ Retry policy for `outbox`: three attempts with exponential backoff, then `failed
 
 ## Continuous integration
 
-A GitHub Actions workflow builds the image and runs `make qa`, `make infection` and `composer audit` on every push and pull request. The same commands run locally, so CI never fails for a reason that cannot be reproduced on a developer machine.
+A GitHub Actions workflow starts the stack with `make up` and runs `make install`, `make qa`, `make infection` and `make audit` on every push and pull request. The same commands run locally, so CI never fails for a reason that cannot be reproduced on a developer machine.

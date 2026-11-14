@@ -5,7 +5,7 @@ Each milestone ends with a green `make qa` and updated docs. Milestones are impl
 | # | Milestone | Delivers |
 | --- | --- | --- |
 | M0 | Documentation and agents | This documentation set, `CLAUDE.md`, agent definitions (done) |
-| M1 | Skeleton and tooling | Symfony skeleton, Docker stack, Makefile, PHP-CS-Fixer, PHPStan, Deptrac, PHPUnit suites, Infection, CI workflow, `/health` |
+| M1 | Skeleton and tooling | Symfony skeleton, Docker stack, Makefile, PHP-CS-Fixer, PHPStan, Deptrac, PHPUnit suites, Infection, CI workflow, `/health` (in progress: only `/health` remains) |
 | M2 | Shared kernel and buses | `Shared` module: aggregate root, identifiers, `Money`, `Email`, `Clock`, the three buses with middleware, problem-details error handling |
 | M3 | Leads module | `Lead` aggregate with all transitions, commands and queries, persistence, endpoints, full test pyramid |
 | M4 | Outbox and Customers module | Integration event contract, outbox transport and worker, `Customer` aggregate, registration on `LeadConvertedV1` |

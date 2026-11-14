@@ -1,0 +1,35 @@
+# Version control, IDE and agent tooling
+.git
+.gitignore
+.idea
+.claude
+.editorconfig
+
+# Documentation
+docs
+*.md
+
+# Build and stack definitions (the builder still reads the Dockerfile)
+Dockerfile
+.dockerignore
+compose*.yaml
+Makefile
+
+# Local state, never part of an image
+var
+vendor
+.env.local
+.env.*.local
+.env.dev
+.env.test
+
+# Tests and tooling never enter the production image
+tests
+phpunit.dist.xml
+phpstan.dist.neon
+deptrac.yaml
+infection.json5
+rector.php
+.php-cs-fixer.dist.php
+bin/phpunit
+.github

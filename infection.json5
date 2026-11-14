@@ -1,0 +1,24 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": ["src"],
+        // Whitelist by regex on the path relative to src/: only <Module>/Domain and
+        // <Module>/Application are mutated, so new modules are picked up without a
+        // config change. Infrastructure, UserInterface, Contract and src/Kernel.php
+        // never match, and class names are not part of the directory segments.
+        "excludes": ["#^(?![^/]+/(?:Domain|Application)/)#"]
+    },
+    "phpUnit": {
+        "configDir": "."
+    },
+    "testFrameworkOptions": "--testsuite=unit",
+    "tmpDir": "var/infection",
+    "logs": {
+        "text": "var/infection/infection.log"
+    },
+    "minMsi": 85,
+    "ignoreMsiWithNoMutations": true,
+    "mutators": {
+        "@default": true
+    }
+}

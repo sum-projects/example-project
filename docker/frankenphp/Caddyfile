@@ -1,0 +1,26 @@
+{
+	skip_install_trust
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp
+}
+
+{$SERVER_NAME:localhost} {
+	root /app/public
+	encode zstd br gzip
+
+	# Requests that do not match a file in public/ go to the front controller.
+	@phpRoute {
+		not file {path}
+	}
+	rewrite @phpRoute /index.php
+
+	# The front controller is the only script PHP is allowed to execute.
+	@frontController path /index.php
+	php @frontController
+
+	# Everything else is a static file; PHP sources are never served.
+	file_server {
+		hide *.php
+	}
+}
