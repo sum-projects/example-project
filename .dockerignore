@@ -1,0 +1,24 @@
+# Version control, IDE and agent tooling
+.git
+.gitignore
+.idea
+.claude
+.editorconfig
+
+# Documentation
+docs
+*.md
+
+# Build and stack definitions (the builder still reads the Dockerfile)
+Dockerfile
+.dockerignore
+compose*.yaml
+Makefile
+
+# Local state, never part of an image
+var
+vendor
+.env.local
+.env.*.local
+.env.dev
+.env.test

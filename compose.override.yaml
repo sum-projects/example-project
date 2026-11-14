@@ -1,0 +1,18 @@
+services:
+  php:
+    build:
+      target: dev
+      args:
+        UID: ${HOST_UID:-1000}
+        GID: ${HOST_GID:-1000}
+    volumes:
+      - ./:/app
+    environment:
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    tty: true
+
+  database:
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
