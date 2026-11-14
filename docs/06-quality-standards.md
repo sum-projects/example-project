@@ -6,18 +6,22 @@ A change is complete when `make qa` passes. CI also runs mutation testing and a 
 
 | Tool | Standard |
 | --- | --- |
-| PHP-CS-Fixer | `@PER-CS` and `@Symfony` rule sets, strict types, ordered imports |
-| PHPStan | Level max with strict rules and the Symfony and Doctrine extensions; no baseline |
+| PHP-CS-Fixer | `@PER-CS` and `@Symfony` rule sets, the PHP and PHPUnit migration sets for the versions required in `composer.json`, `<?php declare(strict_types=1);` on the opening line, ordered imports |
+| Rector | No pending changes for the PHP sets of the required PHP version, the upgrade sets of the installed Symfony, PHPUnit and Doctrine versions, and Symfony code quality |
+| PHPStan | Level max with strict rules and the Symfony, Doctrine and PHPUnit extensions; no baseline |
 | Deptrac | Layer and module rules from the architecture document; zero violations |
-| PHPUnit | All suites green; no skipped or risky tests |
-| Infection | Minimum 85% mutation score on `Domain` and `Application` |
-| Rector | No pending changes for the configured PHP and Symfony sets |
+| PHPUnit | All suites green; no skipped, incomplete or risky tests, no warnings, notices or deprecations |
+| Infection | Minimum 85% mutation score on `Domain` and `Application`, measured with the unit suite and counting code no test covers |
 | Composer audit | No known vulnerabilities |
 
 Suppressions (`@phpstan-ignore`, baseline entries, Deptrac skips) are not used to get a change through. If a rule is wrong for the project, change the rule in its own commit and explain why.
 
+Two settings exist only because the project has no Domain code and no unit or functional tests yet, and are removed when those arrive: `failOnEmptyTestSuite="false"` in `phpunit.dist.xml` goes once all three suites have a test, and `ignoreMsiWithNoMutations` in `infection.json5` together with `--filter=src/` in the `infection` target go with the first Domain or Application class.
+
 ## Coding rules
 
+- Code is written for the newest stable PHP and Symfony and uses their current features where they make it clearer, for example property hooks, asymmetric visibility, `new` without wrapping parentheses and the pipe operator, instead of the older idiom. Rector and PHP-CS-Fixer rewrite what can be detected mechanically; the rest is a review point.
+- Every file starts with `<?php declare(strict_types=1);` on one line.
 - Classes are `final` by default; value objects, commands, queries, events and DTOs are `final readonly`.
 - Constructor promotion, typed properties, and enums instead of constants for closed sets.
 - No setters on aggregates. Named constructors (`Lead::capture(...)`) instead of public constructors for aggregates and for value objects with more than one way to be built.

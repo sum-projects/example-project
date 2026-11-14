@@ -39,12 +39,14 @@ Namespace root is `App\`.
 | Layer | May depend on | Must not contain |
 | --- | --- | --- |
 | Domain | `Shared\Domain`, PHP itself | Framework or ORM classes, attributes, I/O, other modules |
-| Application | own Domain, `Shared\Application`, `Shared\Domain` | HTTP, SQL, Doctrine, other modules' internals |
-| Infrastructure | everything in its own module, vendor libraries | Business rules |
-| UserInterface | own Application, `Shared` | Business rules, direct repository or ORM access |
+| Application | own Domain, `Contract` namespaces, `Shared\Application`, `Shared\Domain` | HTTP, SQL, Doctrine, other modules' internals |
+| Infrastructure | everything in its own module, `Shared`, other modules' `Contract`, vendor libraries | Business rules |
+| UserInterface | own Application, `Shared`, vendor libraries | Business rules, direct repository or ORM access |
 | Contract | nothing (scalars only) | Domain types |
 
-Across modules, the only allowed import is another module's `Contract` namespace. These rules are encoded in `deptrac.yaml` and fail the build when broken.
+Across modules, the only allowed import is another module's `Contract` namespace. `Contract` namespaces are imported by Application, which maps domain events to its own module's integration events and reacts to those of other modules, and by Infrastructure; Domain never sees them. Vendor code is reachable only from Infrastructure and UserInterface, while PHP's built-in classes are available to every layer.
+
+These rules are encoded in `deptrac.yaml`, one layer per module and layer, and fail the build when broken. A new module needs its layers and rules added there.
 
 ## CQRS
 

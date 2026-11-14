@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Showcase CRM REST API (lead-to-deal pipeline): Symfony, CQRS, DDD, Docker, developed with a team of Claude Code subagents.
 
-**Milestone M1 in progress:** the Docker environment and a clean Symfony 7.4 skeleton exist; QA tooling and application code do not yet. `docs/` is the source of truth. Do not start a milestone from [docs/08-roadmap.md](docs/08-roadmap.md) until the user asks. If code and docs disagree, resolve it in the same change (update the doc or add an ADR).
+**Milestone M1 in progress:** the Docker environment, a clean Symfony 8.1 skeleton on PHP 8.5 and the QA tooling exist; `/health` and application code do not yet. `docs/` is the source of truth. Do not start a milestone from [docs/08-roadmap.md](docs/08-roadmap.md) until the user asks. If code and docs disagree, resolve it in the same change (update the doc or add an ADR).
 
 ## Language
 
@@ -28,11 +28,12 @@ Showcase CRM REST API (lead-to-deal pipeline): Symfony, CQRS, DDD, Docker, devel
 
 ## Commands
 
-Everything runs in Docker through the Makefile; never run PHP, Composer or QA tools on the host. `up`, `down`, `logs`, `sh` and `install` exist today; the QA targets arrive with the rest of M1.
+Everything runs in Docker through the Makefile; never run PHP, Composer or QA tools on the host. Every target of the Makefile contract exists except `migrate` and `migration`, which arrive with Doctrine.
 
 ```
 make up                    # start the stack
-make qa                    # full gate: cs, stan, deptrac, test
+make qa                    # full gate: cs, rector, stan, deptrac, test
+make cs-fix rector-fix     # apply the mechanical fixes
 make test FILTER=LeadTest  # single test; FILE=path for a single file
 ```
 
@@ -48,6 +49,8 @@ Conventional Commits with the module as scope, e.g. `feat(leads): qualify a lead
 - Modules (`Leads`, `Customers`, `Sales`) never call each other; they react to integration events from another module's `Contract` namespace, delivered through the outbox.
 - Command handlers return nothing and change one aggregate per transaction; query handlers return DTOs via DBAL, never aggregates.
 - Aggregates change only through intention-revealing methods that guard invariants; no setters.
+- The project tracks the newest stable PHP and Symfony (versions in `composer.json`). Write with their current features, not older idioms; `make rector` and `make cs` enforce what can be automated.
+- Every PHP file starts with `<?php declare(strict_types=1);` on one line.
 
 ## Agents
 
