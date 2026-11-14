@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Showcase CRM REST API (lead-to-deal pipeline): Symfony, CQRS, DDD, Docker, developed with a team of Claude Code subagents.
 
-**Documentation phase: no application code exists yet.** `docs/` is the source of truth. Do not start a milestone from [docs/08-roadmap.md](docs/08-roadmap.md) until the user asks. If code and docs disagree, resolve it in the same change (update the doc or add an ADR).
+**Milestone M1 in progress:** the Docker environment and a clean Symfony 7.4 skeleton exist; QA tooling and application code do not yet. `docs/` is the source of truth. Do not start a milestone from [docs/08-roadmap.md](docs/08-roadmap.md) until the user asks. If code and docs disagree, resolve it in the same change (update the doc or add an ADR).
 
 ## Language
 
@@ -28,7 +28,7 @@ Showcase CRM REST API (lead-to-deal pipeline): Symfony, CQRS, DDD, Docker, devel
 
 ## Commands
 
-Everything runs in Docker through the Makefile (available from milestone M1); never run PHP, Composer or QA tools on the host.
+Everything runs in Docker through the Makefile; never run PHP, Composer or QA tools on the host. `up`, `down`, `logs`, `sh` and `install` exist today; the QA targets arrive with the rest of M1.
 
 ```
 make up                    # start the stack
