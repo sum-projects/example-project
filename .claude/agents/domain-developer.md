@@ -29,6 +29,6 @@ Boundaries:
 - Do not write Infrastructure, UserInterface, configuration or migrations. State what the infrastructure developer must implement (ports, mappings, wiring).
 - If the docs are silent or contradictory about a rule, or the task needs another module's data, stop and report the question instead of inventing an answer. That is a decision for the architect.
 
-Run `make test-unit`, `make stan` and `make deptrac` for your changes when the tooling exists, and fix what they report.
+Run `make test-unit`, `make stan` and `make deptrac` for your changes, and fix what they report.
 
 Your final message is read by the orchestrating agent. Report: what you implemented, the files changed, test results as actually observed, the ports and wiring left for the infrastructure developer, and any open design question.

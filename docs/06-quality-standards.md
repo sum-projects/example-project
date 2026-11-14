@@ -10,18 +10,18 @@ A change is complete when `make qa` passes. CI also runs mutation testing and a 
 | Rector | No pending changes for the PHP sets of the required PHP version, the upgrade sets of the installed Symfony, PHPUnit and Doctrine versions, and Symfony code quality |
 | PHPStan | Level max with strict rules and the Symfony, Doctrine and PHPUnit extensions; no baseline |
 | Deptrac | Layer and module rules from the architecture document; zero violations |
-| PHPUnit | All suites green; no skipped, incomplete or risky tests, no warnings, notices or deprecations |
+| PHPUnit | All suites green; no skipped, incomplete or risky tests, no warnings or notices, and no deprecations that project code triggers or calls into (deprecations raised between two vendor packages are not reported) |
 | Infection | Minimum 85% mutation score on `Domain` and `Application`, measured with the unit suite and counting code no test covers |
 | Composer audit | No known vulnerabilities |
 
 Suppressions (`@phpstan-ignore`, baseline entries, Deptrac skips) are not used to get a change through. If a rule is wrong for the project, change the rule in its own commit and explain why.
 
-Two settings exist only because the project has no Domain code and no unit or functional tests yet, and are removed when those arrive: `failOnEmptyTestSuite="false"` in `phpunit.dist.xml` goes once all three suites have a test, and `ignoreMsiWithNoMutations` in `infection.json5` together with `--filter=src/` in the `infection` target go with the first Domain or Application class.
+Two settings exist only because the project has no Domain code and no unit or functional tests yet, and are removed when those arrive: `failOnEmptyTestSuite="false"` in `phpunit.dist.xml` goes once all three suites have a test, and `ignoreMsiWithNoMutations` in `infection.json5` together with the `src/` path filter in the `infection` target go with the first Domain or Application class that has logic to mutate.
 
 ## Coding rules
 
 - Code is written for the newest stable PHP and Symfony and uses their current features where they make it clearer, for example property hooks, asymmetric visibility, `new` without wrapping parentheses and the pipe operator, instead of the older idiom. Rector and PHP-CS-Fixer rewrite what can be detected mechanically; the rest is a review point.
-- Every file starts with `<?php declare(strict_types=1);` on one line.
+- Every PHP file starts with `<?php declare(strict_types=1);` on one line. Only the generated `config/bundles.php` and `config/reference.php` are exempt.
 - Classes are `final` by default; value objects, commands, queries, events and DTOs are `final readonly`.
 - Constructor promotion, typed properties, and enums instead of constants for closed sets.
 - No setters on aggregates. Named constructors (`Lead::capture(...)`) instead of public constructors for aggregates and for value objects with more than one way to be built.
@@ -57,7 +57,7 @@ Rules:
 ## Git
 
 - Conventional Commits (`feat(leads): qualify a lead`), written in English, one logical change per commit.
-- `main` is always green. Work happens on short-lived branches and is merged through pull requests.
+- `master` is always green. Work happens on short-lived branches and is merged through pull requests.
 
 ## Definition of done
 

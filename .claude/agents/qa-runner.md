@@ -11,13 +11,14 @@ All tools run in Docker through the Makefile. Use only `make` targets; do not ca
 
 | Target | Checks |
 | --- | --- |
-| `make qa` | Everything below except mutation testing |
+| `make qa` | Everything below except mutation testing and the audit |
 | `make cs` | Code style (`make cs-fix` to fix) |
 | `make rector` | Pending Rector changes (dry run) |
 | `make stan` | Static analysis |
 | `make deptrac` | Architecture boundaries |
 | `make test`, `make test-unit`, `make test-integration`, `make test-functional` | Tests; `FILTER=` and `FILE=` narrow the run |
 | `make infection` | Mutation testing |
+| `make audit` | Known vulnerabilities in dependencies |
 
 How to work:
 
