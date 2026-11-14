@@ -4,7 +4,7 @@
         "directories": ["src"],
         // Whitelist by regex on the path relative to src/: only <Module>/Domain and
         // <Module>/Application are mutated, so new modules are picked up without a
-        // config change. Infrastructure, UserInterface, Contract and src/Kernel.php
+        // config change. Infrastructure, UserInterface, Contracts and src/Kernel.php
         // never match, and class names are not part of the directory segments.
         "excludes": ["#^(?![^/]+/(?:Domain|Application)/)#"]
     },

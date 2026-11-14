@@ -43,7 +43,7 @@ stan: ## Run PHPStan
 	$(PHP) vendor/bin/phpstan analyse --memory-limit=1G
 
 deptrac: ## Check layer and module boundaries
-	$(PHP) vendor/bin/deptrac analyse --no-progress --fail-on-uncovered
+	$(PHP) vendor/bin/deptrac analyse --config-file=deptrac.php --no-progress --fail-on-uncovered
 
 rector: ## Show pending Rector changes (dry run)
 	$(PHP) vendor/bin/rector process --dry-run --no-progress-bar

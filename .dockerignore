@@ -27,7 +27,7 @@ vendor
 tests
 phpunit.dist.xml
 phpstan.dist.neon
-deptrac.yaml
+deptrac.php
 infection.json5
 rector.php
 .php-cs-fixer.dist.php
