@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional\Shared\Infrastructure\Http;
+namespace App\Tests\Functional\Shared\UserInterface\Http;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

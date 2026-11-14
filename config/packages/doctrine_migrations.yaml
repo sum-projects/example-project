@@ -1,4 +1,4 @@
 doctrine_migrations:
-    migrations_paths:
-        'DoctrineMigrations': '%kernel.project_dir%/migrations'
+    # No path is registered here. Each module owns its migrations and registers
+    # their namespace and directory in src/<Module>/config/packages/doctrine_migrations.yaml.
     enable_profiler: false

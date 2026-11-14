@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Shared\Domain and Shared\Application hold base classes and interfaces, not services.
+    App\Shared\Infrastructure\:
+        resource: '../Infrastructure/'
+
+    App\Shared\UserInterface\:
+        resource: '../UserInterface/'

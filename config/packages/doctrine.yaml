@@ -11,8 +11,9 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
-        # No mapping is registered yet. Each module adds its XML mapping directory
-        # (src/<Module>/Infrastructure/Persistence/Mapping) when it gets an aggregate.
+        # No mapping is registered here. Each module registers its XML mapping directory
+        # (src/<Module>/Infrastructure/Persistence/Mapping) in its own
+        # src/<Module>/config/packages/doctrine.yaml when it gets an aggregate.
         auto_mapping: false
 
 when@test:

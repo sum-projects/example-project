@@ -2,6 +2,8 @@
 
 ## Conventions
 
+The API is the `Api` channel of the delivery layer (`src/Delivery/Api`, see the [architecture document](03-architecture.md#entry-points)). Its controllers dispatch the commands and queries that the modules expose in `Contracts`, and the channel owns the conventions below.
+
 - Base path `/api/v1`. JSON only (`application/json`); errors use `application/problem+json`.
 - Property names are `camelCase`. Timestamps are ISO 8601 in UTC. Identifiers are UUID v7 strings.
 - Money is an object: `{"amount": 150000, "currency": "EUR"}` with the amount in minor units.
@@ -99,6 +101,8 @@ Deals are created only by converting a lead.
 | --- | --- | --- |
 | GET | `/health` | Liveness and database connectivity; outside the versioned base path |
 
+`/health` is not part of the `Api` channel. It belongs to no module and is served from `Shared/UserInterface`.
+
 `/health` answers `200` when the application is up and the database answers a query, and `503` when the database does not answer it, whether it is unreachable, refuses the credentials or does not exist. A database that does not respond at all still gets its `503` within about three seconds, because the connection gives up after that long. Both answers are `application/json`, have the same shape and carry a `Cache-Control` header with the `no-store` directive:
 
 ```json
@@ -147,4 +151,4 @@ Validation errors add a `violations` array:
 | 422 | The request is well formed but a value is invalid |
 | 500 | Unexpected error; no internal details are exposed |
 
-Each domain exception maps to one stable problem `type`; the list is maintained next to the exception mapping in code and exposed in the OpenAPI description.
+Each domain exception carries one stable code, which is the last segment of the problem `type` (`lead-not-qualified`). The channel takes the status from the shared failure type the exception extends and never names a module's exception class. The codes are listed in the OpenAPI description.

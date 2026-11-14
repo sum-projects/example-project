@@ -21,7 +21,7 @@ The project tracks the newest stable PHP and Symfony releases rather than an LTS
 | Service | Purpose |
 | --- | --- |
 | `php` | FrankenPHP serving the API on `https://localhost` |
-| `worker` | Same image, runs `messenger:consume outbox`; added in M4 together with the outbox |
+| `worker` | Same image, runs `messenger:consume outbox`; added in milestone M4 together with the outbox |
 | `database` | PostgreSQL with a named volume and a health check |
 
 The Dockerfile is multi-stage:
@@ -50,10 +50,10 @@ The Makefile is the only entry point for developers, agents and CI. Every target
 | `sh` | Shell in the `php` container |
 | `install` | `composer install` |
 | `migrate` | Run migrations; succeeds when there is nothing to run |
-| `migration` | Generate a migration from mapping changes and format it; fails when the mapping has none |
+| `migration` | Generate a migration for one module (`MODULE=Leads`) from its mapping changes, limited to the module's schema, and format it; fails when the mapping has none |
 | `cs`, `cs-fix` | PHP-CS-Fixer dry run, fix |
 | `stan` | PHPStan; compiles the dev container first, because the Symfony extension reads it |
-| `deptrac` | Deptrac |
+| `deptrac` | Deptrac with the rules in `deptrac.php` |
 | `rector`, `rector-fix` | Rector dry run, apply |
 | `test` | All suites; accepts `FILTER=` and `FILE=` |
 | `test-unit`, `test-integration`, `test-functional` | One suite |
@@ -66,12 +66,15 @@ The Makefile is the only entry point for developers, agents and CI. Every target
 ## Configuration
 
 - Configuration comes from environment variables. `.env` contains safe development defaults; real secrets are never committed.
-- Service wiring uses autowiring and autoconfiguration. Handlers are registered on their bus by attribute-free interface tagging (`CommandHandler`, `QueryHandler`, `EventHandler` marker interfaces configured with `_instanceof`), which keeps the Application layer free of framework attributes.
+- Every top-level directory of `src/` (a module, `Shared`, `Delivery`) wires itself in its own `config/`: `services.yaml`, `routes.yaml` and `packages/*.yaml` for its slice of bundle configuration. The application's `config/services.yaml` and `config/routes.yaml` import those files by pattern and register nothing themselves, so adding a module changes no shared file. See the [architecture document](03-architecture.md#module-configuration).
+- Service wiring uses autowiring and autoconfiguration. Handlers join their bus through the marker interfaces `CommandHandler`, `QueryHandler` and `EventHandler`, declared once for the whole application, which keeps the Application layer free of Messenger ([ADR 0009](adr/0009-vendor-free-application-and-contracts.md)).
 
 ## Database
 
-- One database, one schema. Tables are prefixed by module.
+- One database and one connection. Each module has its own schema, named after the module in snake case, and tables that belong to no module are owned by `Shared` ([ADR 0008](adr/0008-module-owned-schema-migrations-and-configuration.md)).
 - Schema changes go through migrations only; `doctrine:schema:update` is never used.
+- A module's migrations live in `src/<Module>/Infrastructure/Persistence/Migrations` and are registered in the module's `config/packages/doctrine_migrations.yaml`. There is no root `migrations/` directory. Until the first module registers a path, `make migrate` finds nothing to run and succeeds.
+- The first migration of a module creates its schema. The generated `down()` does not drop it, so that statement is added by hand.
 - Migrations are forward-only and safe to run against a live database.
 - A connection that the server does not accept gives up after three seconds instead of the driver's default thirty, so a database outage fails requests fast instead of holding them.
 - The uniqueness of active lead emails is enforced by a partial unique index in addition to the domain check.

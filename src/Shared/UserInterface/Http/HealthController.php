@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Shared\Infrastructure\Http;
+namespace App\Shared\UserInterface\Http;
 
 use App\Shared\Infrastructure\Health\DatabaseHealthCheck;
 use App\Shared\Infrastructure\Health\HealthStatus;

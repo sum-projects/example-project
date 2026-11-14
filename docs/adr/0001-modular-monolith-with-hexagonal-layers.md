@@ -1,6 +1,6 @@
 # 0001. Modular monolith with hexagonal layers
 
-Status: Accepted (2026-11-14)
+Status: Accepted (2026-11-14). Superseded in part by [0006](0006-delivery-layer-for-client-facing-channels.md) (where entry points live) and [0007](0007-contracts-as-the-public-api-of-a-module.md) (what a module exposes and how modules reach each other).
 
 ## Context
 

@@ -26,7 +26,7 @@ Code uses exactly these words. If a new concept appears, add it here first.
 | Customer registry | `Customers` | Who the customers are | `Customer` |
 | Sales pipeline | `Sales` | Deals and their progress | `Deal` |
 
-Context map: `Leads` is upstream of `Customers` and `Sales`. Both consume the `LeadConverted` integration event published by `Leads` and translate it into their own model. No context reads another context's tables or classes.
+Context map: `Leads` is upstream of `Customers` and `Sales`. Both consume the `LeadConverted` integration event published by `Leads` and translate it into their own model. No context reads another context's tables or classes; what one context may see of another is its `Contracts` (see the [architecture document](03-architecture.md#contracts)).
 
 ```
 Leads ──LeadConverted──► Customers   (registers a customer)
@@ -46,6 +46,7 @@ Kept minimal, in `Shared\Domain`:
 - `Money`: integer amount in minor units plus ISO 4217 currency; immutable; arithmetic and comparison only within one currency
 - `SalesRepId`: identifier of a sales representative
 - `Clock`: interface for the current time
+- Failure types: the base exceptions that every domain exception extends, each carrying a stable code (see [error handling](03-architecture.md#error-handling))
 
 ## Leads context
 
@@ -127,7 +128,7 @@ Domain events: `DealOpened`, `DealAdvanced`, `DealValueChanged`, `DealWon`, `Dea
 
 ## Integration events
 
-Integration events are the published language between contexts. They are separate classes from domain events, live in the publishing module's `Contract` namespace, contain only scalars, and are versioned by class name.
+Integration events are the published language between contexts. They are separate classes from domain events, live in the publishing module's `Contracts\Event` namespace, contain only scalars, and are versioned by class name.
 
 | Event | Published by | Payload | Consumers |
 | --- | --- | --- | --- |

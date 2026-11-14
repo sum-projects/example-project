@@ -56,7 +56,7 @@ The scope is kept small so that every part of it can be built to a production st
 | Goal | How it is met |
 | --- | --- |
 | Business rules cannot be bypassed | Invariants live in aggregates and are unit tested without a framework |
-| Modules stay independent | Communication only through integration events; boundaries checked by Deptrac |
+| Modules stay independent | Communication only through a module's `Contracts`, with integration events for every side effect; boundaries checked by Deptrac |
 | No lost or phantom events | Transactional outbox, idempotent consumers |
-| Predictable API | Uniform conventions, RFC 9457 errors, generated OpenAPI description |
+| Predictable API | One delivery channel that owns the conventions, RFC 9457 errors, generated OpenAPI description |
 | Reproducible environment | Everything runs in Docker through one Makefile |
