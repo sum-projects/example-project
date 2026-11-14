@@ -10,7 +10,7 @@ A small CRM REST API that takes a sales lead from first contact to a won or lost
 
 ## Status
 
-Early implementation. The design is complete; the Docker environment, a clean Symfony skeleton and the quality tooling are in place, and the rest follows the [roadmap](docs/08-roadmap.md).
+Early implementation. The design is complete; the Docker environment, the Symfony skeleton with Doctrine, the quality tooling and a health endpoint are in place, and the rest follows the [roadmap](docs/08-roadmap.md).
 
 ## Getting started
 
@@ -19,10 +19,11 @@ Requirements: Docker with Compose, and GNU Make.
 ```
 make up        # build and start the stack
 make install   # install Composer dependencies
+make migrate   # run the database migrations
 make qa        # run the quality gate
 ```
 
-The application answers on https://localhost (the certificate is issued by Caddy's local authority, so the browser asks for confirmation once). `make help` lists the available targets and `make down` stops the stack.
+The application answers on https://localhost, with a health check at https://localhost/health (the certificate is issued by Caddy's local authority, so the browser asks for confirmation once). `make help` lists the available targets and `make down` stops the stack.
 
 ## Documentation
 

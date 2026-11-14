@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Showcase CRM REST API (lead-to-deal pipeline): Symfony, CQRS, DDD, Docker, developed with a team of Claude Code subagents.
 
-**Milestone M1 in progress:** the Docker environment, a clean Symfony 8.1 skeleton on PHP 8.5 and the QA tooling exist; `/health` and application code do not yet. `docs/` is the source of truth. Do not start a milestone from [docs/08-roadmap.md](docs/08-roadmap.md) until the user asks. If code and docs disagree, resolve it in the same change (update the doc or add an ADR).
+**Milestone M1 is done:** the Docker environment, a Symfony 8.1 skeleton on PHP 8.5 with Doctrine, the QA tooling and `/health` exist; the shared kernel, the buses and the modules do not yet. `docs/` is the source of truth. Do not start a milestone from [docs/08-roadmap.md](docs/08-roadmap.md) until the user asks. If code and docs disagree, resolve it in the same change (update the doc or add an ADR).
 
 ## Language
 
@@ -28,7 +28,7 @@ Showcase CRM REST API (lead-to-deal pipeline): Symfony, CQRS, DDD, Docker, devel
 
 ## Commands
 
-Everything runs in Docker through the Makefile; never run PHP, Composer or QA tools on the host. Every target of the Makefile contract exists except `migrate` and `migration`, which arrive with Doctrine.
+Everything runs in Docker through the Makefile; never run PHP, Composer or QA tools on the host.
 
 ```
 make up                    # start the stack

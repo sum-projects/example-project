@@ -30,11 +30,11 @@ The Dockerfile is multi-stage:
 - `dev`: Xdebug and development configuration, source mounted as a volume
 - `prod`: dependencies installed without dev packages, optimised autoloader, opcache preloading, no source mount, non-root user
 
-`compose.override.yaml` holds development-only settings. A separate `app_test` database is created by the database container's init script so tests never touch development data.
+`compose.override.yaml` holds development-only settings. A separate `app_test` database is created by the database container's init script so tests never touch development data; in the `test` environment Doctrine selects it by appending `_test` to the database name.
 
 Working with the stack:
 
-- After a fresh clone run `make up`, then `make install`.
+- After a fresh clone run `make up`, then `make install` and `make migrate`.
 - Always start the stack through `make`. It passes the host user's uid and gid to the build, so the `dev` container runs as that user and the files it creates in the mounted source stay owned by the developer.
 - Host ports can be changed with `HTTP_PORT`, `HTTPS_PORT`, `HTTP3_PORT` and `POSTGRES_PORT`. PostgreSQL is published on `127.0.0.1` only.
 - The stack has no restart policy: it runs only between `make up` and `make down`.
@@ -49,8 +49,8 @@ The Makefile is the only entry point for developers, agents and CI. Every target
 | `up`, `down`, `logs` | Manage the stack |
 | `sh` | Shell in the `php` container |
 | `install` | `composer install` |
-| `migrate` | Run migrations |
-| `migration` | Generate a migration from mapping changes |
+| `migrate` | Run migrations; succeeds when there is nothing to run |
+| `migration` | Generate a migration from mapping changes and format it; fails when the mapping has none |
 | `cs`, `cs-fix` | PHP-CS-Fixer dry run, fix |
 | `stan` | PHPStan; compiles the dev container first, because the Symfony extension reads it |
 | `deptrac` | Deptrac |
@@ -61,7 +61,7 @@ The Makefile is the only entry point for developers, agents and CI. Every target
 | `audit` | `composer audit` |
 | `qa` | `cs`, `rector`, `stan`, `deptrac`, `test` in that order |
 
-Every target exists except `migrate` and `migration`, which arrive together with Doctrine.
+`test`, `test-integration` and `test-functional` first bring the schema of `app_test` up to date with the migrations, so the tests run against the same schema as the application, locally and in CI.
 
 ## Configuration
 
@@ -73,6 +73,7 @@ Every target exists except `migrate` and `migration`, which arrive together with
 - One database, one schema. Tables are prefixed by module.
 - Schema changes go through migrations only; `doctrine:schema:update` is never used.
 - Migrations are forward-only and safe to run against a live database.
+- A connection that the server does not accept gives up after three seconds instead of the driver's default thirty, so a database outage fails requests fast instead of holding them.
 - The uniqueness of active lead emails is enforced by a partial unique index in addition to the domain check.
 
 ## Messaging transports

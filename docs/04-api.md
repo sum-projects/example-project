@@ -99,6 +99,19 @@ Deals are created only by converting a lead.
 | --- | --- | --- |
 | GET | `/health` | Liveness and database connectivity; outside the versioned base path |
 
+`/health` answers `200` when the application is up and the database answers a query, and `503` when the database does not answer it, whether it is unreachable, refuses the credentials or does not exist. A database that does not respond at all still gets its `503` within about three seconds, because the connection gives up after that long. Both answers are `application/json`, have the same shape and carry a `Cache-Control` header with the `no-store` directive:
+
+```json
+{
+  "status": "ok",
+  "checks": {
+    "database": "ok"
+  }
+}
+```
+
+Every value is `ok` or `fail`, and `status` is `fail` as soon as one check fails. The `503` reports a state rather than a failed request, so it is not a problem details document, and it exposes no internal details such as exception messages. The cause is written to the log instead.
+
 ## Errors
 
 Every error is an RFC 9457 problem details document:
