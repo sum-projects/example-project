@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG FRANKENPHP_TAG=1.13-php8.4-trixie
+ARG FRANKENPHP_TAG=1.13-php8.5-trixie
 
 # ---- base ----
 FROM dunglas/frankenphp:${FRANKENPHP_TAG} AS base
